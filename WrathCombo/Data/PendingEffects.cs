@@ -139,3 +139,20 @@ public unsafe struct ActionEffects : IEnumerable<ActionEffect>
             return *(ActionEffect*)(p + index);
     }
 }
+
+public class PendingEffectTracker
+{
+    public static List<PendingEffectTracker> Trackers = new();
+
+    public ulong GameObjectId;
+    public ActionEffectType Type;
+    public int Value;
+
+    public PendingEffectTracker(ulong gameObjectId, ActionEffectType type, int value)
+    {
+        GameObjectId = gameObjectId;
+        Type = type;
+        Value = value;
+    }
+
+}

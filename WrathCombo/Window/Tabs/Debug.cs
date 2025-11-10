@@ -311,7 +311,7 @@ internal class Debug : ConfigWindow, IDisposable
 
         if (ImGui.CollapsingHeader("Player Data"))
         {
-            CustomStyleText("Health:", $"{player.CurrentHp:N0} / {player.MaxHp:N0} ({MathF.Round(PlayerHealthPercentageHp(), 2)}%)");
+            CustomStyleText("Health:", $"{player.CurrentHp:N0} ({player.RealHP:N0})/ {player.MaxHp:N0} ({MathF.Round(PlayerHealthPercentageHp(), 2)}%)");
             CustomStyleText("MP:", $"{player.CurrentMp:N0} / {player.MaxMp:N0}");
             CustomStyleText("Job:", $"{player.ClassJob.Value.NameEnglish} (ID: {player.ClassJob.RowId})");
             CustomStyleText("Zone:", $"{Svc.Data.GetExcelSheet<TerritoryType>().FirstOrDefault(x => x.RowId == Svc.ClientState.TerritoryType).PlaceName.Value.Name} (ID: {Svc.ClientState.TerritoryType})");

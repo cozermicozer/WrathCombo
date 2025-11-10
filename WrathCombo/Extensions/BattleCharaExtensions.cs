@@ -1,12 +1,37 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using ECommons.DalamudServices;
 using ECommons.GameFunctions;
 using System;
 using System.Linq;
 using WrathCombo.CustomComboNS.Functions;
+using WrathCombo.Data;
 namespace WrathCombo.Extensions;
 
 internal static class BattleCharaExtensions
 {
+    extension(IBattleChara chara)
+    {
+        public uint RealHP => CalculateRealHP(chara);
+
+        private uint CalculateRealHP()
+        {
+            var realHp = 0;
+            var pendingEffects = PendingEffectTracker.Trackers.Where(x => x.GameObjectId == chara.GameObjectId && (x.Type == ActionEffectType.Heal || x.Type == ActionEffectType.Damage));
+            foreach (var eff in pendingEffects)
+            {
+                if (eff.Type == ActionEffectType.Heal)
+                {
+                    realHp += eff.Value;
+                }
+                else if (eff.Type == ActionEffectType.Damage)
+                {
+                    realHp -= eff.Value;
+                }
+            }
+            PendingEffectTracker.Trackers.RemoveAll(x => x.GameObjectId == chara.GameObjectId && (x.Type == ActionEffectType.Heal || x.Type == ActionEffectType.Damage));
+            return (uint)Math.Clamp(chara.CurrentHp + realHp, 0, chara.MaxHp);
+        }
+    }
     public unsafe static CombatRole GetRole(this WrathPartyMember chara)
     {
         if (chara.RealJob?.Role == 1) return CombatRole.Tank;

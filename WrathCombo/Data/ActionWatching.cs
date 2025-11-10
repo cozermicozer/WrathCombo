@@ -132,6 +132,8 @@ public static class ActionWatching
                     // Event: Heal or Damage
                     if (effType is ActionEffectType.Heal or ActionEffectType.Damage)
                     {
+                        PendingEffectTracker.Trackers.Add(new(targetId, effType, effValue));
+
                         if (partyMembers.TryGetValue(targetId, out var member))
                         {
                             member.CurrentHP = effType == ActionEffectType.Damage
