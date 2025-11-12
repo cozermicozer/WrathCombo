@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.DalamudServices;
 using ECommons.GameFunctions;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using System;
 using System.Linq;
 using WrathCombo.CustomComboNS.Functions;
@@ -11,25 +12,34 @@ internal static class BattleCharaExtensions
 {
     extension(IBattleChara chara)
     {
-        public uint RealHP => CalculateRealHP(chara);
+        public uint RealHP => (uint)Math.Clamp(chara.CurrentHp + chara.PendingHPChange, 0, chara.MaxHp);
+        public int PendingHPChange => CalculatePendingHPChange(chara);
+        public unsafe Span<ActionEffectHandler.EffectEntry> IncomingEffects => chara.Struct()->ActionEffectHandler.IncomingEffects;
 
-        private uint CalculateRealHP()
+        private int CalculatePendingHPChange()
         {
             var realHp = 0;
-            var pendingEffects = PendingEffectTracker.Trackers.Where(x => x.GameObjectId == chara.GameObjectId && (x.Type == ActionEffectType.Heal || x.Type == ActionEffectType.Damage));
-            foreach (var eff in pendingEffects)
+            var effects = chara.IncomingEffects;
+            foreach (var eff in effects)
             {
-                if (eff.Type == ActionEffectType.Heal)
+                if (eff.GlobalSequence == 0)
+                    continue;
+
+                foreach (var e in eff.Effects.Effects)
                 {
-                    realHp += eff.Value;
-                }
-                else if (eff.Type == ActionEffectType.Damage)
-                {
-                    realHp -= eff.Value;
+                    var t = (ActionEffectType)e.Type;
+                    if (t is ActionEffectType.Heal)
+                    {
+                        realHp += e.Value;
+                    }
+                    if (t is ActionEffectType.Damage)
+                    {
+                        realHp -= e.Value;
+                    }
                 }
             }
-            PendingEffectTracker.Trackers.RemoveAll(x => x.GameObjectId == chara.GameObjectId && (x.Type == ActionEffectType.Heal || x.Type == ActionEffectType.Damage));
-            return (uint)Math.Clamp(chara.CurrentHp + realHp, 0, chara.MaxHp);
+
+            return realHp;
         }
     }
     public unsafe static CombatRole GetRole(this WrathPartyMember chara)
