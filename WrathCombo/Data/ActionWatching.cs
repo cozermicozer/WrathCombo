@@ -398,6 +398,9 @@ public static class ActionWatching
                         (actionType, replacedWith, location: &location);
                 }
 
+                if (NIN.MudraSigns.Contains(actionManager->QueuedActionId))
+                    actionManager->QueuedActionId = 0;
+
                 //Important to pass actionId here and not replaced. Performance mode = result from earlier, which could be modified. Non-performance mode = original action, which gets modified by the hook. Same result.
                 var hookResult = AutoRotationController.CurrentActIsAutorot ? UseActionHook.Original(actionManager, actionType, actionId, originalTargetId, extraParam, mode, comboRouteId, outOptAreaTargeted) :
                     UseActionHook.Original(actionManager, actionType, actionId, targetId, extraParam, mode, comboRouteId, outOptAreaTargeted);
@@ -414,6 +417,7 @@ public static class ActionWatching
                     NIN.InMudra = true;
                     TimeLastActionUsed = DateTime.Now;
                 }
+
 
                 return hookResult;
             }
