@@ -142,7 +142,7 @@ public abstract class WrathOpener
 
     internal abstract UserData? ContentCheckConfig { get; }
 
-    public bool LevelChecked => Player.Level >= MinOpenerLevel && Player.Level <= MaxOpenerLevel;
+    public bool LevelChecked => Player.SyncedLevel >= MinOpenerLevel && Player.SyncedLevel <= MaxOpenerLevel;
 
     public abstract bool HasCooldowns();
 
@@ -239,7 +239,7 @@ public abstract class WrathOpener
                 }
 
                 while (OpenerStep > 1 && !ActionReady(CurrentOpenerAction) &&
-                       !SkipSteps.Any(x => x.Steps.Any(y => y == OpenerStep - 1)) &&
+                       !SkipSteps.Any(x => x.Steps.Any(y => y == OpenerStep)) &&
                        ActionWatching.TimeSinceLastAction.TotalSeconds > Math.Max(1.5, Math.Max(GCDTotal, Player.Object.TotalCastTime + 0.2f)))
                 {
                     if (OpenerStep >= OpenerActions.Count)

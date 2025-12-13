@@ -180,7 +180,7 @@ public static class ActionWatching
                 }
             }
 
-            if (ActionSheet.TryGetValue(actionId, out var actionSheet) && actionSheet.TargetArea)
+            if (casterEntityId == Player.Object.EntityId && ActionSheet.TryGetValue(actionId, out var actionSheet) && actionSheet.TargetArea)
             {
                 UpdateLastUsedAction(actionId, 1, 0, 0);
             }
@@ -413,7 +413,9 @@ public static class ActionWatching
 
                 if (NIN.MudraSigns.Contains(modifiedAction) && success)
                 {
+                    Svc.Log.Debug($"Mudra used: {modifiedAction.ActionName()}");
                     NIN.InMudra = true;
+                    LastAction = modifiedAction;
                     TimeLastActionUsed = DateTime.Now;
                 }
 
